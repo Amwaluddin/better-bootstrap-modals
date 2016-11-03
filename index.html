@@ -5,12 +5,14 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Better Bootstrap Modals</title>
-	<link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/theme/material.min.css">
 	<link rel="stylesheet" href="css/style.css">
-	<link rel="stylesheet" href="css/bbm-0.3.3.min.css">
+	<link rel="stylesheet" href="css/bbm-0.4.0.css">
 </head>
 <body>
-	<div class="modal" id="modal1" data-backdrop="false" role="dialog">
+	<div class="modal" id="modal1" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -28,7 +30,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="modal fade" id="modal2" data-backdrop="false" role="dialog">
+	<div class="modal fade" id="modal2" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -47,7 +49,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="modal" id="modal3" data-backdrop="false" role="dialog">
+	<div class="modal" id="modal3" role="dialog">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -64,7 +66,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="modal fade" id="modal4" data-backdrop="false" role="dialog">
+	<div class="modal fade" id="modal4" role="dialog">
 		<div class="modal-dialog modal-sm">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -129,9 +131,19 @@
 					<h2>Requirements</h2>
 					<p>For Better Bootstrap Modals to work, all you need to do is include the CSS and Javascript files (or include the tiny source code found below), and disable backdrops as well as <code>tabindex="-1"</code> on all modals.</p>
 					<p>It of course also requires Bootstrap and jQuery.</p>
+					<!-- Limit Modals -->
+					<h3>Limit to only show most recent modal</h3>
+					<p>As of version 0.4.0 you are able to set <code>data-show="first"</code> of the <code>script</code> tag used to load Better Bootstrap Modals. This data-attrribute will set Better Bootstrap Modals to only show the most recent modal opened. Once you close that modal you will be presented with the one before it.</p>
+					<textarea class="code-block" data-type="htmlmixed"><script data-show="first" src="js/bbm-0.4.0.js"></script></textarea>
 					<!-- Backdrop -->
+					<h3>Force Backdrop to be Excluded</h3>
+					<p> As of version 0.4.0 you are able to set <code>data-force-backdrop="false"</code> of the <code>script</code> tag used to load Better Bootstrap Modals. This code will force the backdrop to be set to false. Of couse you are still able to disable the backdrop using the method below too.</p>
+					<textarea class="code-block" data-type="htmlmixed"><script data-force-backdrop="false" src="js/bbm-0.4.0.js"></script></textarea>
 					<h3>Disable backdrop and don't include <code>tabindex="-1"</code></h3>
-					<pre>&lt;!-- Basic Bootstrap modal without backdrop --&gt;<br>&lt;div class="modal" id="modal1" data-backdrop="false" role="dialog"&gt;<br>    ...<br>&lt;/div&gt;</pre>
+					<textarea class="code-block" data-type="htmlmixed"><!-- Basic Bootstrap modal without backdrop -->
+<div class="modal" id="modal1" data-backdrop="false" role="dialog">
+    ...
+</div></textarea>
 				</div>
 			</div>
 		</div>
@@ -140,15 +152,78 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
-					<h2>Source code (v0.3.3)</h2>
+					<h2>Source code (v0.4.0)</h2>
 					<p>To demonstrate how tiny Better Bootstrap Modals really is, here's all the source code:</p>
 					<!-- CSS -->
 					<h3>CSS</h3>
-					<pre>.modal-container {<br>    -webkit-overflow-scrolling: touch;<br>    overflow-y: scroll;<br>    z-index: 1040;<br><br>    position: fixed;<br>    top: 0;<br>    left: 0;<br>    right: 0;<br>    bottom: 0;<br><br>    background: rgba(0, 0, 0, 0.24);<br>}<br><br>.modal {<br>    position: relative;<br>}</pre>
+					<textarea class="code-block" data-type="css">.modal-container {
+    background: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    height: 0px;
+    left: 0;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: scroll;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1041;
+}
+body.modal-open .modal-container {
+    height: 100%;
+}
+body.modal-open .modal-container > .modal {
+    position: relative;
+}
+body.modal-open .modal-container > .modal.in {
+    display: block;
+}
+body.modal-open .modal-container.show-first-only > .modal.in ~ .modal.in {
+    display: none;
+}</textarea>
 					<!-- Javascript -->
 					<h3>Javascript</h3>
-					<pre>bbm_modals = [];<br><br>$(document).ready(function() {<br>    var cont = "modal-container";<br>    $(".modal").on("show.bs.modal", function() {<br>        var self = $(this),<br>            id = self.attr("id");<br><br>        if (bbm_modals.length == 0) {<br>            self.wrap('&lt;div class="' + cont + '"&gt;&lt;/div&gt;');<br>        }<br>        $("." + cont).prepend(self);<br><br>        bbm_modals.push(id);<br>        self.show().addClass("bbm-open");<br>    });<br><br>    $(".modal").on("hide.bs.modal", function() {<br>        var self = $(this),<br>            id = self.attr("id");<br><br>        bbm_modals.splice(bbm_modals.indexOf(id), 1);<br>        self.hide().removeClass("bbm-open");<br><br>        $("body").append(self);<br><br>        if (bbm_modals.length == 0) {<br>            $("." + cont).detach();<br>        }<br>    });<br><br>    $("body").on("click", "." + cont, function(e) {<br>        if (!$(e.target).is(".modal-dialog *")) {<br>            $(".modal.bbm-open").modal("hide");<br>        }<br>    });<br>});</pre>
-				</div>
+					<textarea class="code-block" data-type="javascript">$(document).ready(function() {
+    var $modalContainer = $('<div class="modal-container"></div>');
+	var dataVariables = (function() { var scripts = document.getElementsByTagName("script"); return scripts[scripts.length - 1].dataset; })();
+
+    // Check if `.modal-container` exists.
+    // If so, set $modalContainer to first instance
+    // Otherwise add $modalContainer to `body`
+    if ($('body .modal-container').length >= 1) {
+    	$modalContainer = $('.modal-container').eq(0)
+    }else{
+		$('body').append($modalContainer);
+	}
+
+	// If show is set to first, add class to `.modal-container` to limit modals to only show one at a time
+	if (dataVariables.show == 'first') {
+		$modalContainer.addClass('show-first-only');
+	}
+
+	// Add Opening modals to `.modal-container`
+    $('.modal').on('show.bs.modal', function() {
+    	// Check to see if forceBackdrop is set, If not use default backdrop setting
+    	var forceBackdrop = (typeof dataVariables.forceBackdrop != 'undefined' ? (dataVariables.forceBackdrop === 'true') : $(this).data('bs.modal').options.backdrop);
+		$(this).data('bs.modal').options.backdrop = forceBackdrop;
+		// Prepent modal to container
+		$modalContainer.prepend($(this));
+    });
+    
+	// Make sure to remove forced display in favor of css display
+    $('.modal').on('shown.bs.modal', function() {	    	
+		$(this).css('display', '');
+    });
+
+    $('.modal').on('hidden.bs.modal', function() {
+		if ($('.modal.in').length >= 1) {
+			// Make sure not to remove modal-open if modals are still open.
+			$('body').addClass('modal-open');
+		}else{
+			// Remove padding sometimes left over from modals.
+			$('body').css('padding-right', '');
+		}
+	});
+});</textarea>
 			</div>
 		</div>
 	</div>
@@ -156,13 +231,30 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
-					<p class="text-center">Made with care by Daniel Pox &copy; 2016. <a href="https://github.com/danielpox/better-bootstrap-modals/blob/master/LICENSE" target="_blank">MIT License</a>.</p>
+					<p class="text-center">Made with care by Daniel Pox &amp; <a href="http://www.github.com/mouse0270/">Mouse0270</a> &copy; 2016. <a href="https://github.com/danielpox/better-bootstrap-modals/blob/master/LICENSE" target="_blank">MIT License</a>.</p>
 				</div>
 			</div>
 		</div>
 	</footer>
 	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/css/css.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/javascript/javascript.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/xml/xml.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/htmlmixed/htmlmixed.min.js"></script>
 	<script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
-	<script src="js/bbm-0.3.3.min.js"></script>
+	<script data-force-backdrop="false" src="js/bbm-0.4.0.js"></script>
+	<script>
+		$(document).ready(function() {
+			$('textarea.code-block').each(function() {
+				CodeMirror.fromTextArea($(this)[0], {
+					mode: $(this).data('type'),
+					theme: "material",
+					lineNumbers: true,
+					readOnly: true
+				});
+			})
+		});
+	</script>
 </body>
 </html>
